@@ -40,4 +40,17 @@ const userSchema = new mongoose.Schema({
     resetPasswordTime: Date,
 });
 
+// hash password
+userSchema.pre("save", async function(next){
+    this.password = await bcrypt.hash(this.password, 10);
+});
+
+
+// jwt token
+userSchema.methods.getJwtToken = function(){
+    return jwt.sign({id:this._id}, process.env.JWT_SECRET_KEY, {
+        expiresIn : process.env.JWT_EXPIRES
+    });
+};
+
 module.exports = mongoose.model("User", userSchema);
